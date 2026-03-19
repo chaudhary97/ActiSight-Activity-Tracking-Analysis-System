@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Dashboard</h1>
+
+<a href="/logout">Logout</a>
+
+<form method="POST">
+    <select name="name">
+        <option value="">Select Name</option>
+        {% for p in people %}
+        <option value="{{p}}">{{p}}</option>
+        {% endfor %}
+    </select>
+
+    <input type="datetime-local" name="start">
+    <input type="datetime-local" name="end">
+
+    <button type="submit">Search</button>
+</form>
+
+{% if result is not none %}
+<table>
+<tr>
+    <th>Name</th>
+    <th>Activity</th>
+    <th>Start</th>
+    <th>End</th>
+</tr>
+
+{% for row in result.to_dict(orient='records') %}
+<tr>
+<td>{{row.Name}}</td>
+<td>{{row.Activity}}</td>
+<td>{{row.Start_Time}}</td>
+<td>{{row.End_Time}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+<h2>Total Time (Seconds)</h2>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+<script>
+const data = {{ total_time | tojson }};
+
+const labels = Object.keys(data);
+const values = Object.values(data);
+
+new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+        labels: labels,
+        datasets: [{
+            label: "Time Spent",
+            data: values
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
